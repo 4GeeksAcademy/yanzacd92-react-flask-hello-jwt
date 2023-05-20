@@ -4,9 +4,16 @@ This module takes care of starting the API Server, Loading the DB and Adding the
 from flask import Flask, request, jsonify, url_for, Blueprint
 from api.models import db, User
 from api.utils import generate_sitemap, APIException
+from flask_jwt_extended import JWTManager
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_bcrypt import Bcrypt
 
 api = Blueprint('api', __name__)
+bcrypt = Bcrypt(api)
 
+#JWTManager Configuration
+api.config["JWT_SECRET_KEY"] = os.getenv("FLASK_APP_KEY")
+jwt = JWTManager(api)
 
 @api.route('/hello', methods=['POST', 'GET'])
 def handle_hello():
@@ -16,3 +23,35 @@ def handle_hello():
     }
 
     return jsonify(response_body), 200
+
+@app.route('/signup', methods=['POST'])
+def user_create():
+    data = request.get_json()
+    new_user = User.query.filter_by(email=data["email"]).first()
+    if(new_user is not None):
+        return jsonify({
+            "msg": "Email registrado"
+        }), 400
+    
+@app.route('/login', methods=['POST'])
+def user_login():
+    user_email = request.json.get("email")
+    user_password = request.json.get("password")
+    user = User.query.filter_by(email=user_email).first()
+    if(user is not None):
+        return jsonify({
+            "msg": "User not found"
+        }), 401
+    # verify password
+    if bcrypt.check_password_hash(user.password, user_password):
+        return jsonify({"msg": "Wrong password"}), 401
+    
+    # generate token
+    access_token = create_access_token(identity = user.id)
+    return jsonify({"access_token": access_token})
+
+@app.route('/helloprotected', methods=['GET'])
+@jwt_required()
+def hello_protected_get():
+    user_id = get_jwt_identity()
+    return jsonify({"userId": user_id, "msg": "hello protected route"})
