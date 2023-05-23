@@ -30,6 +30,15 @@ const getState = ({ getStore, getActions, setStore }) => {
 				localStorage.setItem("accessToken", resp.data.accessToken)
 				return resp
 			},
+			userSignup: async(email, password) => {
+				const resp = await getActions().apiFetch("/signup", "POST", {email, password})
+				if(resp.code >= 400) {
+					return resp
+				}
+				//setStore({accessToken: resp.data.accessToken})
+				localStorage.setItem("accessToken", resp.data.accessToken)
+				return resp
+			},
 			loadToken(){
 				let token = localStorage.getItem("accessToken")
 				setStore({accessToken: token})
