@@ -29,18 +29,23 @@ def user_create():
         return jsonify({
             "msg": "Email registrado"
         }), 400
+    secure_password = bcrypt.generate_password_hash(data["password"], rounds=None).decode("utf-8")
+    new_user = User(email=data["email"], password=secure_password, is_active=True)
+    db.session.add(new_user)
+    db.session.commit()
+    return jsonify(new_user.serialize()), 201
     
 @api.route('/login', methods=['POST'])
 def user_login():
-    data = request.get_json()
+    user_email = request.json.get("email")
     user_password = request.json.get("password")
-    user = User.query.filter_by(email=data["email"]).first()
+    user = User.query.filter_by(email=user_email).first()
     if(user is not None):
         return jsonify({
             "msg": "User not found"
         }), 401
     # verify password
-    if bcrypt.check_password_hash(user.password, user_password):
+    if not bcrypt.check_password_hash(user.password, user_password):
         return jsonify({"msg": "Wrong password"}), 401
     
     # generate token
