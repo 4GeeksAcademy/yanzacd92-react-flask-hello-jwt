@@ -9,11 +9,8 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 from flask_bcrypt import Bcrypt
 
 api = Blueprint('api', __name__)
-bcrypt = Bcrypt(api)
-
-#JWTManager Configuration
-api.config["JWT_SECRET_KEY"] = os.getenv("FLASK_APP_KEY")
-jwt = JWTManager(api)
+app = Flask(__name__)
+bcrypt = Bcrypt(app)
 
 @api.route('/hello', methods=['POST', 'GET'])
 def handle_hello():
