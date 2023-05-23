@@ -5,6 +5,7 @@ import "../../styles/home.css";
 export const HelloProtected = () => {
 	const { store, actions } = useContext(Context);
     let resp = actions.userHelloProtected()
+    console.log("RESPONSE:  " + resp)
 
 	return (
 		<div className="card">

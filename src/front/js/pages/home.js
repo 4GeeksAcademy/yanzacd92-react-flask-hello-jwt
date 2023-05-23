@@ -14,6 +14,7 @@ export const Home = () => {
 			return
 		}
 		console.log("Login exitoso!!")
+		navigate("/api/helloprotected");
 	}
 
 	function signup() {
