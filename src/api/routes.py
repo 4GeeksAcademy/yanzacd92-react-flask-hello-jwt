@@ -40,7 +40,7 @@ def user_login():
     user_email = request.json.get("email")
     user_password = request.json.get("password")
     user = User.query.filter_by(email=user_email).first()
-    if(user is not None):
+    if(user is None):
         return jsonify({
             "msg": "User not found"
         }), 401
