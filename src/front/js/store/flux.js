@@ -1,3 +1,4 @@
+const apiURL = process.env.BACKEND_URL
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
@@ -20,13 +21,25 @@ const getState = ({ getStore, getActions, setStore }) => {
 			exampleFunction: () => {
 				getActions().changeColor(0, "green");
 			},
-
+			userLogin: async(email, password) => {
+				const resp = await getActions().apiFetch("/login", "POST", {email, password})
+				if(resp.code >= 400) {
+					return resp
+				}
+				setStore({accesstoken: resp.data.accesstoken})
+				localStorage.setItem("accessToken", resp.data.accesstoken)
+				return resp
+			},
+			loadToken(){
+				let token = localStorage.getItem("accessToken")
+				setStore({accessToken: token})
+			},
 			getMessage: async () => {
 				try{
 					// fetching data from the backend
-					const resp = await fetch(process.env.BACKEND_URL + "/api/hello")
-					const data = await resp.json()
-					setStore({ message: data.message })
+					const resp = await getActions().apiFetch("/hello")
+					const data = await resp.json
+					setStore({ message: resp.data.message })
 					// don't forget to return something, that is how the async resolves
 					return data;
 				}catch(error){
@@ -46,6 +59,22 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 				//reset the global store
 				setStore({ demo: demo });
+			},
+			apiFetch: async(endpoint, method="GET", body={}) => {
+				let response = await fetch(apiURL + endpoint, method == "GET" ? undefined: {
+					method,
+					body: JSON.stringify(body),
+					headers: {
+						"Content-Tpe": "application/json"
+					}
+				})
+				if(!response.ok) {
+					console.error(`${response.status}: ${response.statusText}`)
+					return { code: response.status }
+				}
+
+				let data = await response.json()
+				return { code: response.status, data }
 			}
 		}
 	};

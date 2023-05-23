@@ -21,7 +21,7 @@ def handle_hello():
 
     return jsonify(response_body), 200
 
-@app.route('/signup', methods=['POST'])
+@api.route('/signup', methods=['POST'])
 def user_create():
     data = request.get_json()
     new_user = User.query.filter_by(email=data["email"]).first()
@@ -30,11 +30,11 @@ def user_create():
             "msg": "Email registrado"
         }), 400
     
-@app.route('/login', methods=['POST'])
+@api.route('/login', methods=['POST'])
 def user_login():
-    user_email = request.json.get("email")
+    data = request.get_json()
     user_password = request.json.get("password")
-    user = User.query.filter_by(email=user_email).first()
+    user = User.query.filter_by(email=data["email"]).first()
     if(user is not None):
         return jsonify({
             "msg": "User not found"
@@ -47,7 +47,7 @@ def user_login():
     access_token = create_access_token(identity = user.id)
     return jsonify({"access_token": access_token})
 
-@app.route('/helloprotected', methods=['GET'])
+@api.route('/helloprotected', methods=['GET'])
 @jwt_required()
 def hello_protected_get():
     user_id = get_jwt_identity()
