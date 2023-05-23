@@ -26,8 +26,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 				if(resp.code >= 400) {
 					return resp
 				}
-				setStore({accesstoken: resp.data.accesstoken})
-				localStorage.setItem("accessToken", resp.data.accesstoken)
+				setStore({accessToken: resp.data.accessToken})
+				localStorage.setItem("accessToken", resp.data.accessToken)
 				return resp
 			},
 			loadToken(){
@@ -65,7 +65,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					method,
 					body: JSON.stringify(body),
 					headers: {
-						"Content-Tpe": "application/json"
+						"Content-Type": "application/json"
 					}
 				})
 				if(!response.ok) {

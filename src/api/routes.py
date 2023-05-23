@@ -50,7 +50,7 @@ def user_login():
     
     # generate token
     access_token = create_access_token(identity = user.id)
-    return jsonify({"access_token": access_token})
+    return jsonify({"accessToken": access_token})
 
 @api.route('/helloprotected', methods=['GET'])
 @jwt_required()
